@@ -15,5 +15,9 @@
     "express": "^4.16.3",
     "mocha": "^5.2.0",
     "mongoose": "^5.2.4"
+  },
+  "scripts": {
+    "test": "mocha --exit",
+    "start": "node server.js"
   }
 }
