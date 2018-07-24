@@ -1,0 +1,11 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: QLXQ1nLUrp7z64V092bQKrYkoAFnBPiqJ4fYTGOZjjW0tkrPyWcyMnBCwfQFFqs0R118pXnsE1e1izzugqSwBaKJvuZxrCr7u48EFrE4QsSonWqtwxbh1AYuPVqbRcXD1Hbolzs+sLxNt1mG3tjJucBNWE/OOX67+2ZwMq5VRsCazR+xjVcnquVREEs/DeFnfHLmQvR1H6RydsIaFkPHBJboNhE+NcJRLMD1WSCU1egZRgAYSwg3B3OB3l8zlzIUlsuIflUTjyIgY23TZ88wmUf8DnXBWMfrfK4uLdYh4+HbCpgwuPO4WMqlpM7W1Ezr17E+cIfd87rB580Vq95OnFvEY2bogQ+dNarukBj4kkMALDWvGCXhq7+Wreh66PNpFa9+B+dLCpE+1MiNhklwPIp4/7IBqecMhvQYWFoVFdrUhmjuzB+Cvylq/zqmU06FEf2sWSkf60c/g7Hp308B07HInZxGpNtfWRnIQDG9f4D+B56JMK+nfgwSYpd+NDe/C/xEeIlfBbrnKMSQHjRgRuKBW4O9ghYG75nMTKDCtJLDfBsb2Y4yMob4ytGvk7NYKYON6WddLSBTVJBk5z09KwmYUHGhH04YcDreDGFFrKIyT4U6DNgHm35VK9+AJctX47HZwG+Dt1R6hV4SKrc5XahCrntkNPquYP7wrJ3ZT0A=
+  app: warp-zone-api
+  on:
+    repo: avanichyanukroh/warp-zone-api

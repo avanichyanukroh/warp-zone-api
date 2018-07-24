@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --exit",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,12 +13,16 @@
     "body-parser": "^1.18.3",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
     "mocha": "^5.2.0",
-    "mongoose": "^5.2.4"
-  },
-  "scripts": {
-    "test": "mocha --exit",
-    "start": "node server.js"
+    "mongoose": "^5.2.5",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.18.3",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7"
   }
 }
