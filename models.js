@@ -11,7 +11,7 @@ const gameProfileSchema = mongoose.Schema({
         url: {type: String},
         summary: {type: String},
         storyline: {type: String},
-        "collection": {type: Number},
+        series: {type: Number},
         rating: {type: Number},
         total_rating: {type: Number},
         total_rating_count: {type: Number},
@@ -73,15 +73,6 @@ const gameProfileSchema = mongoose.Schema({
             }]
 });
 
-const userProfileSchema = mongoose.Schema({
-
-    username: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
-    real_name: {type: String},
-    user_profile_summary: {type: String},
-    wish_list: [wishListSchema],
-});
-
 const wishListSchema = mongoose.Schema({
 
     id: Number,
@@ -91,7 +82,19 @@ const wishListSchema = mongoose.Schema({
         cloudinary_id: String,
         width: Number,
         height: Number
+    }
 });
+
+const userProfileSchema = mongoose.Schema({
+
+    username: {type: String, required: true, unique: true},
+    password: {type: String, required: true},
+    real_name: {type: String},
+    user_profile_summary: {type: String},
+    wish_list: [wishListSchema]
+});
+
+
 
 const priceListSchema = mongoose.Schema ({
 
@@ -116,4 +119,4 @@ const UserProfile = mongoose.model('UserProfile', userProfileSchema);
 const WishList = mongoose.model('WishList', wishListSchema);
 const PriceList = mongoose.model('PriceList', priceListSchema);
 
-module.exports = {GameProfile, UserProfile, PriceList};
+module.exports = {GameProfile, UserProfile, WishList, PriceList};
