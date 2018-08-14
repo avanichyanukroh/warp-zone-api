@@ -5,10 +5,11 @@ const path = require('path');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-
+const jwt = require('jsonwebtoken');
+const localStrategy = require('./strategies');
 const cors = require('cors');
 const {CLIENT_ORIGIN, DATABASE_URL, PORT} = require('./config');
-const {GameProfile, UserProfile, WishList, PriceList} = require('./models');
+const {GameProfile, UserProfile, WishList, PriceList, CustomList} = require('./models');
 
 const jsonParser = bodyParser.json();
 const config = require('./config');
@@ -16,71 +17,133 @@ const localAuth = passport.authenticate('local', {session: false});
 
 mongoose.Promise = global.Promise;
 
+passport.use(localStrategy);
+
 app.use(morgan('common'));
 
 app.use(express.json());
 
 app.use(
-    cors({
-        origin: CLIENT_ORIGIN
-    })
+		cors({
+				origin: CLIENT_ORIGIN
+		})
 );
 
 const createAuthToken = function(user) {
-  return jwt.sign({user}, config.JWT_SECRET, {
-    subject: user.username,
-    expiresIn: config.JWT_EXPIRY,
-    algorithm: 'HS256'
-  });
+	return jwt.sign({user}, config.JWT_SECRET, {
+		subject: user.username,
+		expiresIn: config.JWT_EXPIRY,
+		algorithm: 'HS256'
+	});
 };
 
- app.get('/api/*', (req, res) => {
-   res.json({ok: true});
- });
-
  app.post('/register', jsonParser, (req, res) => {
-  console.log(req.body);
-  const requiredFields = ['username', 'password'];
-  const missingField = requiredFields.find(field => !(field in req.body));
+	const requiredFields = ['username', 'password'];
+	const missingField = requiredFields.find(field => !(field in req.body));
 
-  if (missingField) {
-    return res.status(422).json({
-      code: 422,
-      reason: 'ValidationError',
-      message: 'Missing field',
-      location: missingField
-    });
-  }
+	if (missingField) {
+		return res.status(422).json({
+			code: 422,
+			reason: 'ValidationError',
+			message: 'Missing field',
+			location: missingField
+		});
+	}
 
-  const stringFields = ['username', 'password'];
-  const nonStringField = stringFields.find(
-    field => field in req.body && typeof req.body[field] !== 'string'
-  );
+	const stringFields = ['username', 'password'];
+	const nonStringField = stringFields.find(
+		field => field in req.body && typeof req.body[field] !== 'string'
+	);
 
-  if (nonStringField) {
-    return res.status(422).json({
-      code: 422,
-      reason: 'ValidationError',
-      message: 'Incorrect field type: expected string',
-      location: nonStringField
-    });
-  }
-  console.log("validation pass");
+	if (nonStringField) {
+		return res.status(422).json({
+			code: 422,
+			reason: 'ValidationError',
+			message: 'Incorrect field type: expected string',
+			location: nonStringField
+		});
+	}
+	console.log("validation pass");
 	return UserProfile.hashPassword(req.body.password)
 		.then(function(hash) {
-      console.log("hashpassword pass");
+			console.log("hashpassword pass");
 			return UserProfile.create({
 				username: req.body.username,
 				password: hash
 				})
-  		.then(function(user) {
-        console.log(user);
-  			res.status(201).json(user);
-  		})
-  		.catch(function(error) {
-  			console.log(error);
-  		});
-    });
+			.then(function(user) {
+				res.status(201).json(user);
+			})
+			.catch(function(error) {
+				console.log(error);
+			});
+		});
+});
+
+app.post('/addToWishlist', jsonParser, (req, res) => {
+	return GameProfile.create({
+
+		id: "id" in req.body ? req.body.id : null,
+		name: "name" in req.body ? req.body.name : null,
+		url: "url" in req.body ? req.body.url : null,
+		summary: "summary" in req.body ? req.body.summary : null,
+		storyline: "storyline" in req.body ? req.body.storyline : null,
+		rating: "rating" in req.body ? req.body.rating : null,
+		popularity: "popularity" in req.body ? req.body.popularity : null,
+		total_rating: "total_rating" in req.body ? req.body.total_rating : null,
+		total_rating_count: "total_rating_count" in req.body ? req.body.total_rating_count : null,
+		rating_count: "rating_count" in req.body ? req.body.rating_count : null,
+		developers: "developers" in req.body ? req.body.developers : null,
+		publishers: "publishers" in req.body ? req.body.publishers : null,
+		game_engines: "game_engines" in req.body ? req.body.game_engines : null,
+		category: "category" in req.body ? req.body.category : null,
+		time_to_beat: {
+			hastly: "time_to_beat" in req.body ? req.body.time_to_beat.hastly : null,
+			normally: "time_to_beat" in req.body ? req.body.time_to_beat.normally : null,
+			completely: "time_to_beat" in req.body ? req.body.time_to_beat.completely : null
+		},
+		player_perspectives: "player_perspectives" in req.body ? req.body.player_perspectives : null,
+		game_modes: "game_modes" in req.body ? req.body.game_modes : null,
+		themes: "themes" in req.body ? req.body.themes : null,
+		genres: "genres" in req.body ? req.body.genres : null,
+		first_release_date: "first_release_date" in req.body ? req.body.first_release_date : null,
+		platforms: "platforms" in req.body ? req.body.platforms : null,
+		release_dates: "release_dates" in req.body ? req.body.release_dates : null,
+		alternative_names: "alternative_names" in req.body ? req.body.alternative_names : null,
+		screenshots: "screenshots" in req.body ? req.body.screenshots : null,
+		videos: "videos" in req.body ? req.body.videos : null,
+		cover: {
+			url: "cover" in req.body ? req.body.cover.url : null,
+			cloudinary_id: "cover" in req.body ? req.body.cover.cloudinary_id : null,
+			width: "cover" in req.body ? req.body.cover.width : null,
+			height: "cover" in req.body ? req.body.cover.height : null
+		},
+		esrb: {
+			synopsis: "esrb" in req.body ? req.body.synopsis : null,
+			rating: "esrb" in req.body ? req.body.rating : null
+		},
+		pegi: {
+			rating: "pegi" in req.body ? req.body.rating : null
+		},
+		websites: "websites" in req.body ? req.body.websites : null
+	})
+	.then(gameProfile => {
+		return UserProfile.findOneAndUpdate(
+			{"username": req.body.username},
+			{$push:
+				{"wish_list": gameProfile}
+			},
+			{new: true}
+		);
+	})
+	.then(userProfile => {
+		console.log(userProfile);
+		res.status(201).json(userProfile);
+	})
+	.catch(err => {
+		console.error(err);
+      res.status(500).json({ message: 'Internal server error'});
+	});
 });
 
 app.post('/login', localAuth, (req, res) => {
@@ -97,44 +160,44 @@ let server;
 // this function connects to our database, then starts the server
 function runServer(databaseUrl, port = PORT) {
 
-  return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, err => {
-      if (err) {
-        return reject(err);
-      }
-      server = app.listen(port, () => {
-        console.log(`Your app is listening on port ${port}`);
-        resolve();
-      })
-        .on('error', err => {
-          mongoose.disconnect();
-          reject(err);
-        });
-    });
-  });
+	return new Promise((resolve, reject) => {
+		mongoose.connect(databaseUrl, err => {
+			if (err) {
+				return reject(err);
+			}
+			server = app.listen(port, () => {
+				console.log(`Your app is listening on port ${port}`);
+				resolve();
+			})
+				.on('error', err => {
+					mongoose.disconnect();
+					reject(err);
+				});
+		});
+	});
 }
 
 // this function closes the server, and returns a promise. we'll
 // use it in our integration tests later.
 function closeServer() {
-  return mongoose.disconnect().then(() => {
-    return new Promise((resolve, reject) => {
-      console.log('Closing server');
-      server.close(err => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      });
-    });
-  });
+	return mongoose.disconnect().then(() => {
+		return new Promise((resolve, reject) => {
+			console.log('Closing server');
+			server.close(err => {
+				if (err) {
+					return reject(err);
+				}
+				resolve();
+			});
+		});
+	});
 }
 
 // if server.js is called directly (aka, with `node server.js`), this block
 // runs. but we also export the runServer command so other code (for instance, test code) can start the server as needed.
 if (require.main === module) {
 
-  runServer(DATABASE_URL).catch(err => console.error(err));
+	runServer(DATABASE_URL).catch(err => console.error(err));
 }
 
  module.exports = {app};
