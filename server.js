@@ -80,6 +80,12 @@ const createAuthToken = function(user) {
 		});
 });
 
+app.post('/login', localAuth, (req, res) => {
+
+	const authToken = createAuthToken(req.user);
+	res.status(200).json({'authToken': authToken, 'user': req.user});
+});
+
 app.post('/addToWishlist', jsonParser, (req, res) => {
 	return GameProfile.create({
 
@@ -142,14 +148,8 @@ app.post('/addToWishlist', jsonParser, (req, res) => {
 	})
 	.catch(err => {
 		console.error(err);
-      res.status(500).json({ message: 'Internal server error'});
+			res.status(500).json({ message: 'Internal server error'});
 	});
-});
-
-app.post('/login', localAuth, (req, res) => {
-
-  const authToken = createAuthToken(req.user);
-  res.json({'authToken': authToken, 'user': req.user});
 });
 
 // closeServer needs access to a server object, but that only
@@ -200,4 +200,4 @@ if (require.main === module) {
 	runServer(DATABASE_URL).catch(err => console.error(err));
 }
 
- module.exports = {app};
+ module.exports = { runServer, app, closeServer };

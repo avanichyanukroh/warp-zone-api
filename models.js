@@ -157,7 +157,7 @@ const userProfileSchema = mongoose.Schema({
 	user_profile_summary: {type: String, default: "No summary"},
 	platform: [{name: String}],
 	genre_of_interest: [{name: String}],
-	wish_list: [wishListSchema],
+	wish_list: [gameProfileSchema],
 	custom_list: [customListSchema]
 });
 
