@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const localStrategy = require('./strategies');
 const cors = require('cors');
 const {CLIENT_ORIGIN, DATABASE_URL, PORT} = require('./config');
-const {GameProfile, UserProfile, WishList, PriceList, CustomList} = require('./models');
+const {GameProfile, UserProfile, PriceList, CustomList} = require('./models');
 
 const jsonParser = bodyParser.json();
 const config = require('./config');
@@ -66,7 +66,6 @@ const createAuthToken = function(user) {
 	console.log("validation pass");
 	return UserProfile.hashPassword(req.body.password)
 		.then(function(hash) {
-			console.log("hashpassword pass");
 			return UserProfile.create({
 				username: req.body.username,
 				password: hash
@@ -143,7 +142,6 @@ app.post('/addToWishlist', jsonParser, (req, res) => {
 		);
 	})
 	.then(userProfile => {
-		console.log(userProfile);
 		res.status(201).json(userProfile);
 	})
 	.catch(err => {
