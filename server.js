@@ -1,5 +1,5 @@
- const express = require('express');
- const app = express();
+const express = require('express');
+const app = express();
 const morgan = require('morgan');
 const path = require('path');
 const passport = require('passport');
