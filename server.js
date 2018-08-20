@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const localStrategy = require('./strategies');
 const cors = require('cors');
 const {CLIENT_ORIGIN, DATABASE_URL, PORT} = require('./config');
-const {GameProfile, UserProfile, WishList, PriceList, CustomList} = require('./models');
+const {GameProfile, UserProfile, PriceList, CustomList} = require('./models');
 
 const jsonParser = bodyParser.json();
 const config = require('./config');
@@ -23,13 +23,9 @@ app.use(morgan('common'));
 
 app.use(express.json());
 
-app.use(
-		cors({
-				origin: CLIENT_ORIGIN
-		})
-);
+app.use(cors({origin: CLIENT_ORIGIN}));
 
-const createAuthToken = function(user) {
+const createAuthToken = (user) => {
 	return jwt.sign({user}, config.JWT_SECRET, {
 		subject: user.username,
 		expiresIn: config.JWT_EXPIRY,
@@ -63,21 +59,34 @@ const createAuthToken = function(user) {
 			location: nonStringField
 		});
 	}
-	console.log("validation pass");
 	return UserProfile.hashPassword(req.body.password)
-		.then(function(hash) {
-			console.log("hashpassword pass");
-			return UserProfile.create({
+		.then((hash) => {
+			UserProfile.create({
 				username: req.body.username,
 				password: hash
-				})
-			.then(function(user) {
-				res.status(201).json(user);
-			})
-			.catch(function(error) {
-				console.log(error);
+		})
+		.then(() => {
+			return CustomList.create({
+				"title": "Games Currently Playing",
+				"content": "Enter your first game"
 			});
+		})
+		.then((currentlyPlayingGamesList) => {
+			return UserProfile.findOneAndUpdate(
+				{"username": req.body.username},
+				{$push:
+					{"custom_list": currentlyPlayingGamesList}
+				},
+				{new: true}
+			);
+		})
+		.then((user) => {
+			res.status(201).json(user);
+		})
+		.catch((error) => {
+			console.log(error);
 		});
+	});
 });
 
 app.post('/login', localAuth, (req, res) => {
@@ -126,10 +135,10 @@ app.post('/addToWishlist', jsonParser, (req, res) => {
 		},
 		esrb: {
 			synopsis: "esrb" in req.body ? req.body.synopsis : null,
-			rating: "esrb" in req.body ? req.body.rating : null
+			rating: "esrb" in req.body ? req.body.esrb.rating : null
 		},
 		pegi: {
-			rating: "pegi" in req.body ? req.body.rating : null
+			rating: "pegi" in req.body ? req.body.pegi.rating : null
 		},
 		websites: "websites" in req.body ? req.body.websites : null
 	})
@@ -143,7 +152,46 @@ app.post('/addToWishlist', jsonParser, (req, res) => {
 		);
 	})
 	.then(userProfile => {
-		console.log(userProfile);
+		res.status(201).json(userProfile);
+	})
+	.catch(err => {
+		console.error(err);
+		res.status(500).json({ message: 'Internal server error'});
+	});
+});
+
+app.post('/editUserProfile', jsonParser, (req, res) => {
+	return UserProfile.findOneAndUpdate(
+		{"username": req.body.username},
+		{$set:
+			{
+				"nickname": req.body.nickname,
+				"platform": req.body.platform,
+				"genre_of_interest": req.body.genre_of_interest,
+				"user_profile_summary": req.body.user_profile_summary,
+				"user_portrait": req.body.user_portrait
+			  }
+		},
+		{new: true}
+	)
+	.then(userProfile => {
+		res.status(201).json(userProfile);
+	})
+	.catch(err => {
+		console.error(err);
+		res.status(500).json({ message: 'Internal server error'});
+	});
+});
+
+app.post('/deleteFromWishList', jsonParser, (req, res) => {
+	return UserProfile.findOneAndUpdate(
+		{"username": req.body.username},
+		{$pull:
+			{"wish_list": { _id: req.body._id } }
+		},
+		{new: true}
+	)
+	.then(userProfile => {
 		res.status(201).json(userProfile);
 	})
 	.catch(err => {
@@ -152,6 +200,36 @@ app.post('/addToWishlist', jsonParser, (req, res) => {
 	});
 });
 
+app.post('/editCustomList', jsonParser, (req, res) => {
+	return CustomList.findOneAndUpdate(
+		{_id: req.body._id},
+		{$set:
+			{
+				"title": req.body.title,
+				"content": req.body.content
+			  }
+		},
+		{new: true}
+	)
+	.then (newList => {
+		return UserProfile.findOneAndUpdate(
+			{username: req.body.username},
+			{$set:
+				{
+					custom_list: newList
+				}
+			},
+			{new: true}
+		)
+	})
+	.then(userProfile => {
+		res.status(201).json(userProfile);
+	})
+	.catch(err => {
+		console.error(err);
+		res.status(500).json({ message: 'Internal server error'});
+	});
+});
 // closeServer needs access to a server object, but that only
 // gets created when `runServer` runs, so we declare `server` here
 // and then assign a value to it in run
