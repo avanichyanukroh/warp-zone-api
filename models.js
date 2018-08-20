@@ -86,8 +86,8 @@ const userProfileSchema = mongoose.Schema({
 	nickname: {type: String, default: "Gamer#1"},
 	user_portrait: {type: String, default: "https://slm-assets2.secondlife.com/assets/12181178/view_large/Superhero_silhouette__Superhero_Collection.jpg?1440171439"},
 	user_profile_summary: {type: String, default: "No summary"},
-	platform: {type: String},
-	genre_of_interest: {type: String},
+	platform: {type: String, default: "No platform listed"},
+	genre_of_interest: {type: String, default: "No genre of interest listed"},
 	wish_list: [gameProfileSchema],
 	custom_list: [customListSchema]
 });
