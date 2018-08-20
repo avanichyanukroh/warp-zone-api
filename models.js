@@ -16,8 +16,8 @@ const gameProfileSchema = mongoose.Schema({
 		total_rating: {type: Number},
 		total_rating_count: {type: Number},
 		rating_count: {type: Number},
-		developers: [{type: Number}],
-		publishers: [{type: Number}],
+		developers: [{type: String}],
+		publishers: [{type: String}],
 		game_engines: [{type: Number}],
 		category: {type: Number},
 		time_to_beat: {
@@ -76,7 +76,7 @@ const gameProfileSchema = mongoose.Schema({
 const customListSchema = mongoose.Schema ({
 
 	"title": {type: String},
-	"content": [{item: String}]
+	"content": {type: String}
 });
 
 const userProfileSchema = mongoose.Schema({
@@ -86,8 +86,8 @@ const userProfileSchema = mongoose.Schema({
 	nickname: {type: String, default: "Gamer#1"},
 	user_portrait: {type: String, default: "https://slm-assets2.secondlife.com/assets/12181178/view_large/Superhero_silhouette__Superhero_Collection.jpg?1440171439"},
 	user_profile_summary: {type: String, default: "No summary"},
-	platform: [{name: String}],
-	genre_of_interest: [{name: String}],
+	platform: {type: String},
+	genre_of_interest: {type: String},
 	wish_list: [gameProfileSchema],
 	custom_list: [customListSchema]
 });
